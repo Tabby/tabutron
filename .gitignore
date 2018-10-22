@@ -111,3 +111,5 @@ notes/
 
 # Visual Studio Code project stuff
 *.code-workspace
+
+token.txt
