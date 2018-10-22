@@ -108,3 +108,6 @@ dist-pkg/
 
 # Notes
 notes/
+
+# Visual Studio Code project stuff
+*.code-workspace
