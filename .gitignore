@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# AWS distribution package folder
+dist-pkg/
+
+# Notes
+notes/
