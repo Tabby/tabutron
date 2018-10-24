@@ -1,30 +1,37 @@
 import boto3
 import discord
 import asyncio
+import datetime
 
 client = discord.Client()
 with open("token.txt", "r") as token_file:
     token = token_file.read()
 
-@client.event
-async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
+purge_channel_ids = {"503927900790063114", "503928427049385994", "503926807892852736", "503928190578720778"}
+output_channel_id = "491405337341984769"
 
-@client.event
-async def on_message(message):
-    if message.content.startswith('!test'):
-        counter = 0
-        tmp = await client.send_message(message.channel, 'Calculating messages...')
-        async for log in client.logs_from(message.channel, limit=100):
-            if log.author == message.author:
-                counter += 1
+def is_not_pinned(m: discord.Message):
+    return (not m.pinned)
 
-        await client.edit_message(tmp, 'You have {} messages.'.format(counter))
-    elif message.content.startswith('!sleep'):
-        await asyncio.sleep(5)
-        await client.send_message(message.channel, 'Done sleeping')
+async def main():
+    await client.login(token)
+    asyncio.ensure_future(client.connect())
+    await client.wait_until_ready()
 
-client.run(token)
+    out_channel = client.get_channel(output_channel_id)
+    before_date = datetime.datetime.now() - datetime.timedelta(weeks=2)
+    for id in purge_channel_ids:
+        channel = client.get_channel(id)
+        messages = client.logs_from(channel, limit=100000, before=before_date)
+        count = 0
+        async for m in messages:
+            if is_not_pinned(m):
+                count += 1
+                await client.delete_message(m)
+        if count > 0:
+            await client.send_message(out_channel, "{} messages deleted from {}".format(count, channel.name))
+    await client.logout()
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+loop.close()
