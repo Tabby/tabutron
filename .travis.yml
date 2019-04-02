@@ -2,8 +2,19 @@ language: python
 python:
   - "3.6"
 
+install:
+  - mkdir build
+  - pip install -r requirements.txt -t build
+
 script:
-- echo "skipping tests"
+  - echo "skipping tests"
+
+before_deploy:
+  - mkdir dist
+  - cp -R src/* build/
+  - pushd build
+  - zip -r ../dist/lambda.zip .
+  - popd
 
 deploy:
   provider: lambda
@@ -13,6 +24,7 @@ deploy:
   runtime: python3.6
   module_name: tabutron
   handler_name: lambda_handler
+  zip: dist/lambda.zip
   timeout: 300
   secret_access_key:
     secure: DTfzonhpoFh8OGSyU9139VwSkgJC/Gv4ddI7kEZYs9nUsGqpMptnCB/O+RsWJZFkWjwD/mkrCxHuqHirn63TvM2RrYuCh4LVAlwXw22hpSO5HizV8Yfvi6OzDEX1CR1K148FE0oxpPw4vdJpJ+NqxnfhmYTCGMsyzV9fWtnuiuWMTvNSSuk2Y7QxqcuEJ5dzPAZbTcrG3ru4dykAbeptf4832zZxLf2OTsw4v8m7PuozwkzHB7OdEBzrGpxL3QeSoAFa8KnNoKTlF0R09HLjKB9fmbFm526ItP+9nBv41guLj89Qto6jG7Ix9p5E5v9HdM67Jg/2L4+wpniB4OooAKWPMHlG+fETmEp6cV1UaCFh6TZdkvl+ll+lyvL4BHmIKQi+xvMx8umuuodyjNKsb5++PmB5hBnK39mqShNsTrSY1zFqSaCYkcaVCFlAlb4r3QI79kHLZHecPVec1Nq+eJJ1EFJ8g93nWli2fiEp+IHs48z3fhfxmrUGhy18W6iEPUbHXLFSI/khTHyTr14wFv7wbNPNT4shy8WuXGLz6rrD1Pl6V3Q+q0R5vU0ZS9Cw2Y46re5JKDyjy86PRP90tqIngXKGQLrVgLNGYdvWsmcfukg85L6MMH0gNcDBLZumrjkcPAgZEm26s0n+/oetDVDmWLbbXoYPmRw7StUQRCM=
