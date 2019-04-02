@@ -6,13 +6,17 @@ import logging
 from sys import stdout
 from os import environ
 
+# Create a default logger. This is sufficient for AWS logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-handler = logging.StreamHandler(stdout)
-handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+
+if not 'LAMBDA' in environ:
+    # Add a console logger for development
+    handler = logging.StreamHandler(stdout)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
 client = discord.Client()
 token = environ['DISCORD_API_KEY']
@@ -57,6 +61,10 @@ async def main():
             await client.send_message(out_channel, "{} messages deleted from {}".format(count, channel.name))
     await client.logout()
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
-loop.close()
+def lambda_handler(event, context):
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    loop.close()
+
+if not 'LAMBDA' in environ:
+    lambda_handler(None, None)
