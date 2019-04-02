@@ -2,8 +2,8 @@ language: python
 python:
   - "3.6"
 
-install:
-  - pip install boto3 discord
+script:
+- echo "skipping tests"
 
 deploy:
   provider: lambda
