@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import logging
 from sys import stdout
+from os import environ
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -14,7 +15,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 client = discord.Client()
-token = ""
+token = environ['DISCORD_API_KEY']
 
 TWO_WEEKS_AGO = datetime.timedelta(weeks=2)
 ONE_DAY_AGO = datetime.timedelta(days=1)

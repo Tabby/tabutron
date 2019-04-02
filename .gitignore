@@ -113,3 +113,6 @@ notes/
 *.code-workspace
 
 token.txt
+#Eclipse files
+.project
+.pydevproject
