@@ -1,4 +1,3 @@
-import discord
 import datetime
 
 TWO_WEEKS_AGO = datetime.timedelta(weeks=2)
@@ -11,23 +10,23 @@ purge_channel_ids = [
     ("562252547541434370", ONE_DAY_AGO)    #daily-venting
 ]
 
-def is_not_pinned(m: discord.Message):
-    return (not m.pinned)
-
-async def purge_channels(logger, client, out_channel, now):
+async def purge_channels(logger, client, now):
     for channel_id, delta in purge_channel_ids:
         before_date = now - delta
         channel = client.get_channel(channel_id)
+
         logger.info("Checking #{}".format(channel.name))
         messages = client.logs_from(channel, limit=100000, before=before_date)
+
         logger.info("Got messages, deleting unpinned ones older than {}".format(before_date))
-        count = 0
-        total = 0
-        async for m in messages:
-            total += 1
-            if is_not_pinned(m):
-                count += 1
-                await client.delete_message(m)
-        logger.info("{} messages found in #{}({}), {} deleted".format(total, channel.name, id, count))
-        if count > 0:
-            await client.send_message(out_channel, "{} messages deleted from {}".format(count, channel.name))
+        deleted_messages = 0
+        total_messages = 0
+        async for message in messages:
+            total_messages += 1
+            if (not message.pinned):
+                deleted_messages += 1
+                await client.delete_message(message)
+
+        logger.info("{} messages found in #{}({}), {} deleted".format(total_messages, channel.name, channel_id, deleted_messages))
+        if deleted_messages > 0:
+            logger.warn("{} messages deleted from {}".format(deleted_messages, channel.name))

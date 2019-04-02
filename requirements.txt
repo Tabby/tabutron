@@ -1,2 +1,5 @@
+# Boto3 dependency only needed for interacting with AWS. Here for convenience in case I want it later
 # boto3>=1.9.125
-discord>=0.16.12
+
+# Pin Discord lib to prevent unexpected breakage
+discord==0.16.12
